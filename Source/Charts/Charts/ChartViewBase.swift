@@ -167,6 +167,12 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
     /// (use the `marker` property to specify a marker)
     open var isDrawMarkersEnabled: Bool { return drawMarkers }
     
+    /// if set to true, the marker is drawn at the top of the view
+    open var drawMarkersAtTop = false
+    
+    /// if set to true, the marker is drawn at the top of the view
+    open var keepMarkersInHorizontalViewport = false
+    
     /// The marker that is displayed when a value is clicked on the chart
     open var marker: IMarker?
     
@@ -617,7 +623,7 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
                 continue
             }
 
-            let pos = getMarkerPosition(highlight: highlight)
+            var pos = getMarkerPosition(highlight: highlight)
 
             // check bounds
             if !_viewPortHandler.isInBounds(x: pos.x, y: pos.y)
@@ -627,6 +633,32 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
 
             // callbacks to update the content
             marker.refreshContent(entry: e, highlight: highlight)
+            
+            
+            // keep the markers inside
+            
+            if(drawMarkersAtTop)
+            {
+                pos = CGPoint(x: pos.x, y: 0)
+            }
+            
+            if(keepMarkersInHorizontalViewport)
+            {
+                var markerSize = CGSize.zero
+                if let marker = marker as? MarkerView {
+                    markerSize = marker.bounds.size
+                } else if let marker = marker as? MarkerImage {
+                    markerSize = marker.size
+                }                
+                
+                let overlapWidth = markerSize.width/2
+                if pos.x < overlapWidth {
+                    pos = CGPoint(x: overlapWidth, y: pos.y)
+                } else if pos.x > self.bounds.size.width - overlapWidth {
+                    pos = CGPoint(x: self.bounds.size.width - overlapWidth, y: pos.y)
+                }
+                
+            }            
             
             // draw the marker
             marker.draw(context: context, point: pos)

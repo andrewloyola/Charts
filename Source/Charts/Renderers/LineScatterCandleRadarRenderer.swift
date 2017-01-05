@@ -15,6 +15,10 @@ import CoreGraphics
 @objc(LineScatterCandleRadarChartRenderer)
 open class LineScatterCandleRadarRenderer: BarLineScatterCandleBubbleRenderer
 {
+    public var verticalTopInset: CGFloat = 0.0
+    public var verticalBottomInset: CGFloat = 0.0
+    
+
     public override init(animator: Animator?, viewPortHandler: ViewPortHandler?)
     {
         super.init(animator: animator, viewPortHandler: viewPortHandler)
@@ -35,8 +39,8 @@ open class LineScatterCandleRadarRenderer: BarLineScatterCandleBubbleRenderer
         if set.isVerticalHighlightIndicatorEnabled
         {
             context.beginPath()
-            context.move(to: CGPoint(x: point.x, y: viewPortHandler.contentTop))
-            context.addLine(to: CGPoint(x: point.x, y: viewPortHandler.contentBottom))
+            context.move(to: CGPoint(x: point.x, y: viewPortHandler.contentTop + verticalTopInset))
+            context.addLine(to: CGPoint(x: point.x, y: viewPortHandler.contentBottom - verticalBottomInset))
             context.strokePath()
         }
         
